@@ -62,7 +62,7 @@ There are `r no_of_aisles` in total. The top five most ordered from aisles inclu
 ```{r, fig.height = 8, fig.width = 10}
 aisle_counts %>%
   filter(no_of_items > 10000) %>%
-  mutate(aisle = fct_reorder(aisle, no_of_items)) %>% # reordering 
+  mutate(aisle = fct_reorder(aisle, no_of_items)) %>% # reordering by no., for better visualization
   ggplot(aes(x = no_of_items, y = aisle)) +
   geom_col(fill = "lightblue", color = "black") +
   labs(
@@ -313,8 +313,7 @@ nhanes_data %>%
     fill = "Sex"
   )
 ```
-The table shows the distribution of participants by sex and education level. There are `r sum(demo_table$Male)` male and `r sum(demo_table$Female)` female participants. The "More than high school" education category has the most participants overall. The plots show that participants are spread across various age groups in all education categories. The "More than high school" category appears to have more younger participants, while "Less than high school" has more older participants. Age distributions between males and females appear relatively similar within each education level (with exception of "More than high school" category, where younger females are disproportionately higher than in value than males).
-
+The table shows the distribution of participants by sex and education level. There are `r sum(demo_table$Male)` male and `r sum(demo_table$Female)` female participants. The "More than high school" education category has the most participants overall. The plots show that participants are spread across various age groups in all education categories. The "More than high school" category appears to have more younger participants, while "Less than high school" has more older participants. Age distributions between males and females appear relatively similar within each education level, with one notable exception: in the "More than high school" category, there are notably more young adult females compared to males in the same age range.
 
 ### 3. Total activity analysis
 ```{r, message = FALSE}
