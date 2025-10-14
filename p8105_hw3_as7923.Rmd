@@ -5,8 +5,119 @@ date: "2025-10-13"
 output: github_document
 ---
 
+Before beginning, loading core libraries (tidyverse).
+```{r setup, message = FALSE}
+library(tidyverse)
+```
+
 ## PROBLEM 1
+### General dataset description
+```{r}
+# Loading instacart
+library(p8105.datasets)
+data("instacart")
+
+# Quick overview of structure
+rows = nrow(instacart)
+columns = ncol(instacart)
+
+# Checking variable names
+column_names = colnames(instacart)
+
+# First rows of dataset to show data structure
+t(head(instacart, 1)) # transposed in order to show all variable names
+```
+The Instacart dataset contains `r rows` observations (where each row represents an order of a single product from an Instacart order) and `r columns` variables. Key variables in this dataset include:
+
+* `r column_names[1]`: order identifier
+* `r column_names[11]`: name of product
+* `r column_names[14]`: name of aisle/product location
+* `r column_names[15]`: department
+* `r column_names[8]`: day of the week on which the order was placed
+* `r column_names[9]`: hour of the day on which the order was placed
+
+### 1. Total no. of aisles, most ordered from aisles
+```{r}
+# Counting unique aisles
+no_of_aisles = instacart %>% 
+  distinct(aisle_id) %>% 
+  nrow()
+
+# Most ordered from aisles
+aisle_counts = instacart %>% 
+  group_by(aisle) %>% 
+  summarize(no_of_items = n()) %>% 
+  arrange(desc(no_of_items))
+
+head(aisle_counts, 5)
+```
+There are `r no_of_aisles` in total. The top five most ordered from aisles include: fresh vegetables, fresh fruits, packaged vegetables fruit, yogurt, and packaged cheese.
+
+### 2. Plot of no. of items ordered in each aisle (for aisles with more than 10000 items ordered)
+```{r, fig.height = 8, fig.width = 10}
+aisle_counts %>%
+  filter(no_of_items > 10000) %>%
+  mutate(aisle = fct_reorder(aisle, no_of_items)) %>%
+  ggplot(aes(x = no_of_items, y = aisle)) +
+  geom_col(fill = "steelblue") +
+  labs(
+    title = "No. of items ordered by aisle",
+    caption = "Limited to aisles with more than 10,000 items ordered",
+    x = "No. of items ordered",
+    y = "Aisle"
+  )
+```
+
+### 3. Three most popular items in specific aisles
+```{r}
+popular_items = instacart %>%
+  filter(aisle %in% c("baking ingredients", "dog food care", "packaged vegetables fruits")) %>% # keeping rows with only specified aisle
+  group_by(aisle, product_name) %>%
+  summarize(no_of_orders = n(), .groups = "drop") %>% # removing grouping from the result
+  group_by(aisle) %>%
+  top_n(3, no_of_orders) %>% # keeping the top 3 rows with the highest no_of_order values
+  arrange(aisle, desc(no_of_orders))
+
+popular_items
+```
+
+### 4. Pink Lady Apples and Coffee Ice Cream orders
+```{r}
+mean_hour_table <- instacart %>%
+  filter(product_name %in% c("Pink Lady Apples", "Coffee Ice Cream")) %>%
+  group_by(product_name, order_dow) %>%
+  summarize(mean_hour = mean(order_hour_of_day), .groups = "drop") %>% #removing grouping from the result
+  mutate(
+    day_of_week = case_when(
+      order_dow == 0 ~ "Sunday",
+      order_dow == 1 ~ "Monday",
+      order_dow == 2 ~ "Tuesday",
+      order_dow == 3 ~ "Wednesday",
+      order_dow == 4 ~ "Thursday",
+      order_dow == 5 ~ "Friday",
+      order_dow == 6 ~ "Saturday"
+    ),
+    day_of_week = factor(day_of_week, levels = c("Sunday", "Monday", "Tuesday", 
+                                                   "Wednesday", "Thursday", "Friday", "Saturday"))
+  ) %>%
+  select(product_name, day_of_week, mean_hour) %>%
+  pivot_wider(
+    names_from = day_of_week,
+    values_from = mean_hour
+  )
+
+mean_hour_table
+```
 
 ## PROBLEM 2
+```{r}
+
+```
+
+
 
 ## PROBLEM 3
+```{r}
+
+```
+
