@@ -54,7 +54,12 @@ aisle_counts = instacart %>%
   summarize(no_of_items = n()) %>%  # counting no. of items ordered for each aisle
   arrange(desc(no_of_items)) # descending order to find top aisles
 
-head(aisle_counts, 5) # displaying top 5 aisles
+# Displaying top 5 aisles with better formatting
+knitr::kable(
+  head(aisle_counts, 5),
+  col.names = c("Aisle", "Number of items"),
+  caption = "Top 5 most ordered from aisles"
+)
 ```
 There are `r no_of_aisles` in total. The top five most ordered from aisles include: fresh vegetables, fresh fruits, packaged vegetables fruit, yogurt, and packaged cheese.
 
@@ -84,7 +89,12 @@ popular_items = instacart %>%
   top_n(3, no_of_orders) %>% # keeping the top 3 rows with the highest no_of_order values
   arrange(aisle, desc(no_of_orders))
 
-popular_items
+# Displaying the table with better formatting
+knitr::kable(
+  popular_items,
+  col.names = c("Aisle", "Product Name", "Number of Orders"),  # improved column names
+  caption = "Three most popular items in specific aisles"
+)
 ```
 The table above shows the three most popular items in each of the specified aisles. In the baking ingredients aisle, Light Brown Sugar is the most popular item with 499 orders, followed by Pure Baking Soda (387 orders) and Cane Sugar (336 orders). For dog food care, Snack Sticks Chicken & Rice Recipe Dog Treats is at the top with 30 orders, followed by Organix Chicken & Brown Rice Recipe (28 orders) and Small Dog Biscuits (26 orders). The packaged vegetables fruits aisle shows significantly higher order volumes, with Organic Baby Spinach being significantly popular at 9784 orders, followed by Organic Raspberries (5546 orders) and Organic Blueberries (4966 orders). 
 
@@ -113,7 +123,14 @@ mean_hour_table = instacart %>%
     values_from = mean_hour
   )
 
-mean_hour_table
+# Displaying table with better formatting
+knitr::kable(
+  mean_hour_table,
+  col.names = c("Product name", "Sunday", "Monday", "Tuesday", "Wednesday", 
+                "Thursday", "Friday", "Saturday"),
+  caption = "Mean hour of day for Pink Lady Apples and Coffee Ice Cream orders",
+  digits = 2  # round to 2 decimal places
+)
 ```
 This table shows the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered for each day of the week. Pink Lady Apples are generally ordered between 11 AM and 2 PM across all days. Coffee Ice Cream shows a slightly different pattern, typically ordered between noon and 4 PM, . Overall, both products tend to be ordered during late mornings to early afternoon hours, with Coffee Ice Cream ordered slightly later in the day than Pink Lady Apples on most days.
 
@@ -157,7 +174,7 @@ no_fewer_than_10 = sum(zip_observations$no_of_observations < 10)
 ggplot(zip_observations, aes(x = no_of_observations)) +
   geom_histogram(binwidth = 5, fill = "lightblue", color = "black") +
   labs(
-    title = "Distribution of observations per ZIP Code",
+    title = "Distribution of observations per ZIP code",
     x = "No. of observations",
     y = "No. of ZIP Codes"
   ) 
@@ -220,7 +237,7 @@ print(price_plots)
 The plot shows significant variation in rental price trajectories within each borough. New York shows the widest range of ZIP code prices, with some areas exceeding $6,000/month while others remain around $2,500. Kings displays a similar pattern with significant variation. The Bronx shows the most consistency, with ZIP codes clustering together and moving in parallel, suggesting more uniform housing costs. Queens shows moderate variation with most ZIP codes following similar upward trends. Richmond has limited data but shows tight clustering among its ZIP codes. 
 
 ### 5. 2023 rental prices by borough
-```{r}
+```{r, fig.height = 8, fig.width = 10}
 # Calculating average rental price per ZIP code in 2023
 zip_2023_avg = rental_with_borough %>%
   filter(year == 2023) %>%
@@ -235,17 +252,17 @@ box_plots = ggplot(zip_2023_avg, aes(x = county, y = avg_rental_price, fill = co
   labs(
     title = "Distribution of ZIP code level rental prices by borough (2023)",
     x = "Borough",
-    y = "Average Rental Price ($)",
+    y = "Average rental price ($)",
     caption = "Each dot represents one ZIP code's average rental price in 2023."
   ) + 
   theme(legend.position = "none")
 
 print(box_plots)
 ```
-The distribution plot illustrates substantial variation in rental prices both between and within boroughs. New York shows the highest median rental price and the widest range, with some ZIP codes exceeding $6,000 per month. Kings displays significant variation with several high-priced outlier ZIP codes comparable to New York prices. Queens shows a more compressed distribution with moderate prices and fewer extreme outliers. The Bronx has a more concentrated distribution, with most ZIP codes clustering around $2,000-$2,500. Richmond shows the tightest distribution with the least variation between ZIP codes.
+The plots above illustrate substantial variation in rental prices both between and within boroughs. New York shows the highest median rental price and the widest range, with some ZIP codes exceeding $6,000 per month. Kings displays significant variation with several higher-priced outlier ZIP codes comparable to New York prices. Queens shows a more compressed distribution with moderate prices and few extreme outliers. The Bronx has a more concentrated distribution, with most ZIP codes clustering around $2,000-$2,500. Richmond shows the tightest distribution with the least variation between ZIP codes.
 
 ### 6. Combining plots into a single graphic
-```{r}
+```{r, fig.height = 12, fig.width = 10}
 # Combining the two plots
 combined_plot = price_plots / box_plots +
   plot_annotation(
@@ -305,13 +322,14 @@ knitr::kable(demo_table,
 nhanes_data %>%
   ggplot(aes(x = age, fill = sex)) +
   geom_histogram(position = "dodge", binwidth = 5, alpha = 0.8) +
-  facet_wrap(~education) +
+  facet_grid(. ~ education) +
   labs(
-    title = "Age Distribution by Education Level and Sex",
+    title = "Age distribution by education level and sex",
     x = "Age (years)",
     y = "Count",
     fill = "Sex"
-  )
+  )+
+  scale_fill_viridis_d(option = "plasma", end = 0.6)  # added viridis colors
 ```
 The table shows the distribution of participants by sex and education level. There are `r sum(demo_table$Male)` male and `r sum(demo_table$Female)` female participants. The "More than high school" education category has the most participants overall. The plots show that participants are spread across various age groups in all education categories. The "More than high school" category appears to have more younger participants, while "Less than high school" has more older participants. Age distributions between males and females appear relatively similar within each education level, with one notable exception: in the "More than high school" category, there are notably more young adult females compared to males in the same age range.
 
@@ -332,7 +350,8 @@ nhanes_total %>%
     x = "Age (years)",
     y = "Total activity (MIMS)",
     color = "Sex"
-  ) 
+  ) +
+  scale_color_viridis_d(option = "plasma", end = 0.6)  # added viridis colors
 ```
 Total activity generally declines with age across all education levels. Women tend to have slightly higher activity levels than men in the "Less than high school" and "High school equivalent" categories, particularly among younger participants. After age 40, activity levels in women decline below men in the "Less than high school" category. In the "More than high school" category, activity patterns are more similar between sexes. The decline in activity with age is most pronounced in participants with less education.
 
@@ -358,7 +377,7 @@ activity_time_course %>%
   ggplot(aes(x = minute, y = mean_activity, color = sex)) +
   geom_line(linewidth = 0.8, alpha = 0.8) +
   geom_smooth(se = FALSE, linewidth = 1.2) +
-  facet_wrap(~education, ncol = 1) +
+  facet_grid(education ~ ., switch = "y") +  
   labs(
     title = "24-hour activity time course by education level and sex",
     x = "Minute of day (starting at midnight)",
@@ -367,6 +386,7 @@ activity_time_course %>%
   ) +
   scale_x_continuous(breaks = seq(0, 1440, 240),
                      labels = c("0:00", "4:00", "8:00", "12:00", 
-                               "16:00", "20:00", "24:00"))
+                               "16:00", "20:00", "24:00")) +
+  scale_color_viridis_d(option = "plasma", end = 0.6)  # added viridis colors
 ```
 The 24-hour activity patterns reveal clear diurnal rhythms across all groups. Activity is minimal during nighttime hours (roughly midnight to 6 AM), increases during morning hours, peaks during midday and afternoon (approximately 8 AM to 4 PM), and declines in the evening. Across all education levels, women show slightly higher activity levels than men during peak daytime hours, with slightly more pronounced difference in the "More than high school" group. 
